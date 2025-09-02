@@ -14,17 +14,17 @@ public record Address
         AdditionalInfo = additionalInfo;
     }
 
-    public string Country { get; private set; }
+    public string Country { get; }
 
-    public string City { get; private set; }
+    public string City { get; }
 
-    public string Street { get; private set; }
+    public string Street { get; }
 
-    public string HouseNumber { get; private set; }
+    public string HouseNumber { get; }
 
-    public string? OfficeNumber { get; private set; }
+    public string? OfficeNumber { get; }
 
-    public string? AdditionalInfo { get; private set; }
+    public string? AdditionalInfo { get; }
 
     public static Result<Address> Create(string country, string city, string street, string houseNumber, string? officeNumber, string? additionalInfo)
     {

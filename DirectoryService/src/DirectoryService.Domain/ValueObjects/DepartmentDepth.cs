@@ -9,7 +9,7 @@ public record DepartmentDepth
         Value = value;
     }
 
-    public int Value { get; private set; }
+    public int Value { get; }
 
     public static Result<DepartmentDepth> Create(int depth)
     {

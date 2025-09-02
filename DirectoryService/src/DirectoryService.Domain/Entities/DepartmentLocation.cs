@@ -4,19 +4,19 @@ namespace DirectoryService.Domain.Entities;
 
 public class DepartmentLocation
 {
-    private DepartmentLocation(Department department, Location location)
+    private DepartmentLocation(Guid departmentId, Guid locationId)
     {
-        Department = department;
-        Location = location;
+        DepartmentId = departmentId;
+        LocationId = locationId;
     }
 
-    public Department Department { get; private set; }
+    public Guid DepartmentId { get; private set; }
 
-    public Location Location { get; private set; }
+    public Guid LocationId { get; private set; }
 
-    public static Result<DepartmentLocation> Create(Department department, Location location)
+    public static Result<DepartmentLocation> Create(Guid departmentId, Guid locationId)
     {
-        var obj = new DepartmentLocation(department, location);
+        var obj = new DepartmentLocation(departmentId, locationId);
         return Result.Success(obj);
     }
 }

@@ -13,9 +13,9 @@ public class Department
         Path path,
         DepartmentDepth depth,
         bool isActive, 
-        List<Department>? children, 
-        List<DepartmentLocation>? departmentLocations, 
-        List<DepartmentPosition>? departmentPositions)
+        List<Department> children, 
+        List<DepartmentLocation> departmentLocations, 
+        List<DepartmentPosition> departmentPositions)
     {
         Id = Guid.NewGuid();
         CreateAt = DateTime.UtcNow;
@@ -49,17 +49,17 @@ public class Department
 
     public DateTime UpdateAt { get; private set; }
 
-    private List<Department>? _children;
+    private List<Department> _children;
     
-    public IReadOnlyList<Department>? Children => _children;
+    public IReadOnlyList<Department> Children => _children;
 
-    private List<DepartmentLocation>? _departmentLocations;
+    private List<DepartmentLocation> _departmentLocations;
     
-    public IReadOnlyList<DepartmentLocation>? DepartmentLocations => _departmentLocations;
+    public IReadOnlyList<DepartmentLocation>?DepartmentLocations => _departmentLocations;
 
-    private List<DepartmentPosition>? _departmentPositions;
+    private List<DepartmentPosition> _departmentPositions;
 
-    public IReadOnlyList<DepartmentPosition>? DepartmentPositions => _departmentPositions;
+    public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions;
 
     public static Result<Department> Create(
         Name name, 
@@ -68,9 +68,9 @@ public class Department
         Path path, 
         DepartmentDepth depth, 
         bool isActive, 
-        List<Department>? children, 
-        List<DepartmentLocation>? departmentLocations, 
-        List<DepartmentPosition>? departmentPositions)
+        List<Department> children, 
+        List<DepartmentLocation> departmentLocations, 
+        List<DepartmentPosition> departmentPositions)
     {
         if (departmentLocations == null)
             return Result.Failure<Department>("Department location cannot be null!");

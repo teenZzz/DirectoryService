@@ -10,7 +10,7 @@ public record Path
         Value = value;
     }
 
-    public string Value { get; private set; }
+    public string Value { get; }
 
     public static Result<Path> Create(string path)
     {
