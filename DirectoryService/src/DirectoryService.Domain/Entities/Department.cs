@@ -1,19 +1,34 @@
-﻿using DirectoryService.Domain.ValueObjects;
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.ValueObjects;
 using Path = DirectoryService.Domain.ValueObjects.Path;
 
 namespace DirectoryService.Domain.Entities;
 
 public class Department
 {
-    private Department(Guid id, Name name, Identifier identifier, Guid? parentId, Path path, DepartmentDepth depth, DateTime createAt)
+    private Department(
+        Name name, 
+        Identifier identifier, 
+        Guid? parentId, 
+        Path path,
+        DepartmentDepth depth,
+        bool isActive, 
+        List<Department>? children, 
+        List<DepartmentLocation>? departmentLocations, 
+        List<DepartmentPosition>? departmentPositions)
     {
-        Id = id;
+        Id = Guid.NewGuid();
+        CreateAt = DateTime.UtcNow;
+        UpdateAt = DateTime.UtcNow;
         Name = name;
         Identifier = identifier;
         ParentId = parentId;
         Path = path;
         Depth = depth;
-        CreateAt = createAt;
+        IsActive = isActive;
+        _children = children;
+        _departmentLocations = departmentLocations;
+        _departmentPositions = departmentPositions;
     }
 
     public Guid Id { get; private set; }
@@ -28,9 +43,43 @@ public class Department
 
     public DepartmentDepth Depth { get; private set; }
 
-    public bool IsActive { get; private set; } = true;
+    public bool IsActive { get; private set; }
 
     public DateTime CreateAt { get; private set; }
 
     public DateTime UpdateAt { get; private set; }
+
+    private List<Department>? _children;
+    
+    public IReadOnlyList<Department>? Children => _children;
+
+    private List<DepartmentLocation>? _departmentLocations;
+    
+    public IReadOnlyList<DepartmentLocation>? DepartmentLocations => _departmentLocations;
+
+    private List<DepartmentPosition>? _departmentPositions;
+
+    public IReadOnlyList<DepartmentPosition>? DepartmentPositions => _departmentPositions;
+
+    public static Result<Department> Create(
+        Name name, 
+        Identifier identifier, 
+        Guid? parentId, 
+        Path path, 
+        DepartmentDepth depth, 
+        bool isActive, 
+        List<Department>? children, 
+        List<DepartmentLocation>? departmentLocations, 
+        List<DepartmentPosition>? departmentPositions)
+    {
+        if (departmentLocations == null)
+            return Result.Failure<Department>("Department location cannot be null!");
+
+        if (departmentPositions == null)
+            return Result.Failure<Department>("Department position cannot be null!");
+
+        var obj = new Department(name, identifier, parentId, path, depth, isActive, children, departmentLocations, departmentPositions);
+        return Result.Success(obj);
+    }
+
 }

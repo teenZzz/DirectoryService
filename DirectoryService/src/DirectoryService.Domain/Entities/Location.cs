@@ -1,16 +1,19 @@
-﻿using DirectoryService.Domain.ValueObjects;
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.ValueObjects;
 
 namespace DirectoryService.Domain.Entities;
 
 public class Location
 {
-    private Location(Guid id, Name name, Address address, Timezone timeZone, DateTime createdAt)
+    private Location(Name name, Address address, Timezone timeZone, bool isActive)
     {
-        Id = id;
+        Id = Guid.NewGuid();
+        CreatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
         Name = name;
         Address = address;
         Timezone = timeZone;
-        CreatedAt = createdAt;
+        IsActive = isActive;
     }
 
     public Guid Id { get; private set; }
@@ -21,9 +24,15 @@ public class Location
 
     public Timezone Timezone { get; private set; }
 
-    public bool IsActive { get; private set; } = true;
+    public bool IsActive { get; private set; }
 
     public DateTime CreatedAt { get; private set; }
 
     public DateTime UpdatedAt { get; private set; }
+
+    public static Result<Location> Create(Name name, Address address, Timezone timeZone, bool isActive)
+    {
+        var obj = new Location(name, address, timeZone, isActive);
+        return Result.Success(obj);
+    }
 }
