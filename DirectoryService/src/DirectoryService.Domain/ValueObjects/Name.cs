@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Shared;
 
 namespace DirectoryService.Domain.ValueObjects;
 
@@ -16,7 +17,7 @@ public record Name
         if (string.IsNullOrWhiteSpace(name))
             return Result.Failure<Name>("Name cannot be empty!");
 
-        if (name.Length < 3 || name.Length > 150)
+        if (name.Length < Const.Text.MIN_LENGHT || name.Length > Const.Text.MAX_LENGHT)
             return Result.Failure<Name>("Incorrect name length!");
 
         var obj = new Name(name);
