@@ -31,4 +31,6 @@ public class DirectoryServiceDbContext : DbContext
     public DbSet<DepartmentLocation> DepartmentLocations => Set<DepartmentLocation>();
 
     public DbSet<DepartmentPosition> DepartmentPositions => Set<DepartmentPosition>();
+    
+    // TODO: Добавить логгер и проверить БД
 }
