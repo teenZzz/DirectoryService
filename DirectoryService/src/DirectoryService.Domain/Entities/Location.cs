@@ -5,6 +5,11 @@ namespace DirectoryService.Domain.Entities;
 
 public class Location
 {
+    // EF Core
+    private Location()
+    {
+    }
+    
     private Location(Name name, Address address, Timezone timeZone, bool isActive)
     {
         Id = Guid.NewGuid();

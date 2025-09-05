@@ -6,6 +6,11 @@ namespace DirectoryService.Domain.Entities;
 
 public class Department
 {
+    // EF Core
+    private Department()
+    {
+    }
+    
     private Department(
         Name name, 
         Identifier identifier, 
@@ -18,8 +23,8 @@ public class Department
         List<DepartmentPosition> departmentPositions)
     {
         Id = Guid.NewGuid();
-        CreateAt = DateTime.UtcNow;
-        UpdateAt = DateTime.UtcNow;
+        CreatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
         Name = name;
         Identifier = identifier;
         ParentId = parentId;
@@ -45,21 +50,21 @@ public class Department
 
     public bool IsActive { get; private set; }
 
-    public DateTime CreateAt { get; private set; }
+    public DateTime CreatedAt { get; private set; }
 
-    public DateTime UpdateAt { get; private set; }
+    public DateTime UpdatedAt { get; private set; }
 
     private List<Department> _children;
     
-    public IReadOnlyList<Department> Children => _children;
+    public IReadOnlyList<Department> Children => _children = [];
 
     private List<DepartmentLocation> _departmentLocations;
     
-    public IReadOnlyList<DepartmentLocation>?DepartmentLocations => _departmentLocations;
+    public IReadOnlyList<DepartmentLocation>?DepartmentLocations => _departmentLocations = [];
 
     private List<DepartmentPosition> _departmentPositions;
 
-    public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions;
+    public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions = [];
 
     public static Result<Department> Create(
         Name name, 

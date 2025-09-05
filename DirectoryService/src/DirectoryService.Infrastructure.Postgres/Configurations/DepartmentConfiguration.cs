@@ -33,15 +33,16 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 
         builder.Property(d => d.IsActive)
             .IsRequired()
-            .HasColumnName("is_active");
+            .HasColumnName("is_active")
+            .HasDefaultValue(true);
 
-        builder.Property(d => d.CreateAt)
+        builder.Property(d => d.CreatedAt)
             .IsRequired()
-            .HasColumnName("create_at");
+            .HasColumnName("created_at");
 
-        builder.Property(d => d.UpdateAt)
+        builder.Property(d => d.UpdatedAt)
             .IsRequired()
-            .HasColumnName("update_at");
+            .HasColumnName("updated_at");
     }
 
     private static void ConfigureValueObjects(EntityTypeBuilder<Department> builder)
