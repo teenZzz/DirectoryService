@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Postgres;
 
@@ -15,12 +16,15 @@ public class DirectoryServiceDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseNpgsql(_connectionString);
+        optionsBuilder.UseLoggerFactory(CreateLoggerFactory());
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(DirectoryServiceDbContext).Assembly);
     }
+
+    private static ILoggerFactory CreateLoggerFactory() => LoggerFactory.Create(builder => builder.AddConsole());
 
     public DbSet<Department> Departments => Set<Department>();
 
@@ -31,6 +35,4 @@ public class DirectoryServiceDbContext : DbContext
     public DbSet<DepartmentLocation> DepartmentLocations => Set<DepartmentLocation>();
 
     public DbSet<DepartmentPosition> DepartmentPositions => Set<DepartmentPosition>();
-    
-    // TODO: Добавить логгер и проверить БД
 }

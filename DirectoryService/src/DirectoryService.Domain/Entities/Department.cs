@@ -39,7 +39,7 @@ public class Department
     public Guid Id { get; private set; }
 
     public Name Name { get; private set; }
-
+    
     public Identifier Identifier { get; private set; }
 
     public Guid? ParentId { get; private set; }
