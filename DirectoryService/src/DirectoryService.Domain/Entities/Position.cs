@@ -6,6 +6,11 @@ namespace DirectoryService.Domain.Entities;
 
 public class Position
 {
+    // EF Core
+    private Position()
+    {
+    }
+    
     private Position(Name name, string? description, bool isActive)
     {
         Id = Guid.NewGuid();

@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Shared;
 
 
 namespace DirectoryService.Domain.ValueObjects;
@@ -18,10 +19,10 @@ public record Identifier
         if (string.IsNullOrWhiteSpace(identifier))
             return Result.Failure<Identifier>("Identifier cannot be empty!");
 
-        if (identifier.Length < 3 || identifier.Length > 150)
+        if (identifier.Length < Const.Text.MIN_LENGHT || identifier.Length > Const.Text.MAX_LENGHT)
             return Result.Failure<Identifier>("Incorrect identifier length!");
 
-        if (!Regex.IsMatch(identifier, "^[A-Za-z]+$"))
+        if (!Regex.IsMatch(identifier, Const.Regex.LATIN_REGEX))
             return Result.Failure<Identifier>("The identifier must be in Latin!");
 
         var obj = new Identifier(identifier);

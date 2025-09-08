@@ -4,6 +4,11 @@ namespace DirectoryService.Domain.Entities;
 
 public class DepartmentPosition
 {
+    // EF Core
+    private DepartmentPosition()
+    {
+    }
+    
     private DepartmentPosition(Guid departmentId, Guid positionId)
     {
         DepartmentId = departmentId;
