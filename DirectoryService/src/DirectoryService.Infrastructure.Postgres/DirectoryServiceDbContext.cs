@@ -1,10 +1,11 @@
-﻿using DirectoryService.Domain.Entities;
+﻿using DirectoryService.Application;
+using DirectoryService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Postgres;
 
-public class DirectoryServiceDbContext : DbContext
+public class DirectoryServiceDbContext : DbContext, IDirectoryServiceDbContext
 {
     private readonly string _connectionString;
     
