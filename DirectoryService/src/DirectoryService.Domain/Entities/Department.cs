@@ -60,7 +60,7 @@ public class Department
 
     private List<DepartmentLocation> _departmentLocations;
     
-    public IReadOnlyList<DepartmentLocation>?DepartmentLocations => _departmentLocations = [];
+    public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations = [];
 
     private List<DepartmentPosition> _departmentPositions;
 
