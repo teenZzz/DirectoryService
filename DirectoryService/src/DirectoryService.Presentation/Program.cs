@@ -1,13 +1,19 @@
 using DirectoryService.Application;
+using DirectoryService.Application.Repositories;
 using DirectoryService.Infrastructure.Postgres;
+using DirectoryService.Infrastructure.Postgres.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
-builder.Services.AddScoped<IDirectoryServiceDbContext, DirectoryServiceDbContext>(_ => 
+builder.Services.AddScoped<DirectoryServiceDbContext>(_ => 
     new DirectoryServiceDbContext(builder.Configuration.GetConnectionString("DirectoryServiceDb")!));
+
+
+
+builder.Services.AddScoped<ILocationRepository, EfCoreLocationsRepository>();
 
 builder.Services.AddScoped<CreateLocationHandler>();
 

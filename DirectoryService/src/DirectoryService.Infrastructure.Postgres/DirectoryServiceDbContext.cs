@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Postgres;
 
-public class DirectoryServiceDbContext : DbContext, IDirectoryServiceDbContext
+public class DirectoryServiceDbContext : DbContext
 {
     private readonly string _connectionString;
     

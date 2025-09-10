@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using DirectoryService.Application.Repositories;
 using DirectoryService.Contracts;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.ValueObjects;
@@ -7,11 +8,11 @@ namespace DirectoryService.Application;
 
 public class CreateLocationHandler
 {
-    private readonly IDirectoryServiceDbContext _dbContext;
+    private readonly ILocationRepository _locationRepository;
     
-    public CreateLocationHandler(IDirectoryServiceDbContext dbContext)
+    public CreateLocationHandler(ILocationRepository locationRepository)
     {
-        _dbContext = dbContext;
+        _locationRepository = locationRepository;
     }
     
     /// <summary>
@@ -39,9 +40,7 @@ public class CreateLocationHandler
         var location = Location.Create(name, address, timezone, true);
         
         // Сохранение доменных моделей в БД
-        await _dbContext.Locations.AddAsync(location.Value, cancellationToken);
-
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _locationRepository.Add(location.Value, cancellationToken);
         
         return location.Value.Id;
     }
