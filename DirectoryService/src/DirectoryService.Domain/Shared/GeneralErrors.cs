@@ -1,0 +1,27 @@
+﻿using System.Runtime.InteropServices.Marshalling;
+
+namespace DirectoryService.Domain.Shared;
+
+public static class GeneralErrors
+{
+    public static class General
+    {
+        public static Error ValueIsInvalid(string? name = null)
+        {
+            string label = name ?? "value";
+            return Error.Validation(null, $"{label} is invalid!");
+        }
+
+        public static Error NotFound(Guid? id = null)
+        {
+            string forId = id == null ? "" : $"for id '{id}'";
+            return Error.NotFound(null, $"record not found {forId}", id);
+        }
+        
+        public static Error ValueIsRequired(string? name = null)
+        {
+            string label = name ?? "value";
+            return Error.Validation("lenght is invalid", $"{label} lenght is invalid!");
+        }
+    }
+}
