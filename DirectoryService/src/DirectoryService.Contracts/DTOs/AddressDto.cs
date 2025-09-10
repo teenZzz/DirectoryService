@@ -1,16 +1,16 @@
 ﻿namespace DirectoryService.Contracts.DTO;
 
-public class AddressDto
+public record AddressDto
 {
-    public required string Country { get; set; }
+    public required string Country { get; init; }
     
-    public required string City { get; set; }
+    public required string City { get; init; }
     
-    public required string Street { get; set; }
+    public required string Street { get; init; }
     
-    public required string HouseNumber { get; set; }
+    public required string HouseNumber { get; init; }
     
-    public required string OfficeNumber { get; set; }
+    public string? OfficeNumber { get; init; }
 
-    public required string AdditionalInfo { get; set; }
+    public string? AdditionalInfo { get; init; }
 }

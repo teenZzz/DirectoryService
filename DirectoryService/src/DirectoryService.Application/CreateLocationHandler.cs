@@ -25,23 +25,41 @@ public class CreateLocationHandler
         // Бизнес валидация
         
         // Создание доменных моделей
-        var name = Name.Create(request.Name).Value;
+        var nameResult = Name.Create(request.Name);
+        
+        if (nameResult.IsFailure)
+            return Result.Failure<Guid>(nameResult.Error);
 
-        var address = Address.Create(
+        var addressResult = Address.Create(
             request.Address.Country, 
             request.Address.City, 
             request.Address.Street, 
             request.Address.HouseNumber, 
             request.Address.OfficeNumber, 
-            request.Address.AdditionalInfo).Value;
-
-        var timezone = Timezone.Create(request.Timezone).Value;
-
-        var location = Location.Create(name, address, timezone, true);
+            request.Address.AdditionalInfo);
         
+        if (addressResult.IsFailure)
+            return Result.Failure<Guid>(addressResult.Error);
+
+        var timezoneResult = Timezone.Create(request.Timezone);
+        
+        if (timezoneResult.IsFailure)
+            return Result.Failure<Guid>(timezoneResult.Error);
+
+        var name = nameResult.Value;
+        var address = addressResult.Value;
+        var timezone = timezoneResult.Value;
+
+        var locationResult = Location.Create(name, address, timezone, true);
+
+        if (locationResult.IsFailure)
+            return Result.Failure<Guid>(locationResult.Error);
+
+        var location = locationResult.Value;
+
         // Сохранение доменных моделей в БД
-        await _locationRepository.Add(location.Value, cancellationToken);
+        await _locationRepository.Add(location, cancellationToken);
         
-        return location.Value.Id;
+        return location.Id;
     }
 }

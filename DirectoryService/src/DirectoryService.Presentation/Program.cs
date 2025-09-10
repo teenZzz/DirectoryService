@@ -13,7 +13,7 @@ builder.Services.AddScoped<DirectoryServiceDbContext>(_ =>
 
 
 
-builder.Services.AddScoped<ILocationRepository, EfCoreLocationsRepository>();
+builder.Services.AddScoped<ILocationRepository, LocationsRepository>();
 
 builder.Services.AddScoped<CreateLocationHandler>();
 

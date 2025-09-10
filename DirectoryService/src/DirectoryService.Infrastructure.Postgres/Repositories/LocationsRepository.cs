@@ -5,12 +5,12 @@ using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Postgres.Repositories;
 
-public class EfCoreLocationsRepository : ILocationRepository
+public class LocationsRepository : ILocationRepository
 {
     private readonly DirectoryServiceDbContext _dbContext;
-    private readonly ILogger<EfCoreLocationsRepository> _logger;
+    private readonly ILogger<LocationsRepository> _logger;
 
-    public EfCoreLocationsRepository(DirectoryServiceDbContext dbContext, ILogger<EfCoreLocationsRepository> logger)
+    public LocationsRepository(DirectoryServiceDbContext dbContext, ILogger<LocationsRepository> logger)
     {
         _dbContext = dbContext;
         _logger = logger;
@@ -33,7 +33,7 @@ public class EfCoreLocationsRepository : ILocationRepository
 
             // Временно, пока нет Error
             // TODO: заменить на Error
-            return Guid.Empty;
+            return Result.Failure<Guid>(ex.Message);
         }
     }
 }
