@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Shared;
 using DirectoryService.Domain.ValueObjects;
 using Path = DirectoryService.Domain.ValueObjects.Path;
 
@@ -66,7 +67,7 @@ public class Department
 
     public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions = [];
 
-    public static Result<Department> Create(
+    public static Result<Department, Error> Create(
         Name name, 
         Identifier identifier, 
         Guid? parentId, 
@@ -78,13 +79,13 @@ public class Department
         List<DepartmentPosition> departmentPositions)
     {
         if (departmentLocations == null)
-            return Result.Failure<Department>("Department location cannot be null!");
+            return Error.Validation(null, "DepartmentLocations cannot be null!");
 
         if (departmentPositions == null)
-            return Result.Failure<Department>("Department position cannot be null!");
+            return Error.Validation(null, "DepartmentPosition cannot be null!");
 
-        var obj = new Department(name, identifier, parentId, path, depth, isActive, children, departmentLocations, departmentPositions);
-        return Result.Success(obj);
+        return new Department(name, identifier, parentId, path, depth, isActive, children, departmentLocations, departmentPositions);
+        
     }
 
 }

@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Shared;
 
 namespace DirectoryService.Domain.ValueObjects;
 
@@ -14,17 +15,16 @@ public record Timezone
 
     public string Value { get; }
 
-    public static Result<Timezone> Create(string timeZone)
+    public static Result<Timezone, Error> Create(string timeZone)
     {
         if (string.IsNullOrWhiteSpace(timeZone))
-            return Result.Failure<Timezone>("Timezone cannot be empty!");
+            return Error.Validation(null, "Timezone cannot be empty!");
         
         string trimmed = timeZone.Trim();
-        
-        if (!_ianaRegex.IsMatch(trimmed))
-            return Result.Failure<Timezone>("Timezone must be a valid IANA code!");
 
-        var obj = new Timezone(timeZone);
-        return Result.Success(obj);
+        if (!_ianaRegex.IsMatch(trimmed))
+            return Error.Validation(null, "Timezone must be a valid IANA code!");
+
+        return new Timezone(timeZone);
     }
 }

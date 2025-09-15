@@ -15,7 +15,7 @@ public static class GeneralErrors
         public static Error NotFound(Guid? id = null)
         {
             string forId = id == null ? "" : $"for id '{id}'";
-            return Error.NotFound(null, $"record not found {forId}", id);
+            return Error.NotFound(null, $"record not found {forId}");
         }
         
         public static Error ValueIsRequired(string? name = null)

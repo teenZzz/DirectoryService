@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Repositories;
 using DirectoryService.Domain.Entities;
+using DirectoryService.Domain.Shared;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Postgres.Repositories;
@@ -17,7 +18,7 @@ public class LocationsRepository : ILocationRepository
     }
 
 
-    public async Task<Result<Guid>> Add(Location location, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Error>> Add(Location location, CancellationToken cancellationToken)
     {
         try
         {
@@ -31,9 +32,7 @@ public class LocationsRepository : ILocationRepository
         {   
             _logger.LogError(ex, "Fail to insert location");
 
-            // Временно, пока нет Error
-            // TODO: заменить на Error
-            return Result.Failure<Guid>(ex.Message);
+            return Error.Failure(null, ex.Message);
         }
     }
 }

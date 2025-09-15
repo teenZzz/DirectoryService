@@ -2,6 +2,7 @@
 using DirectoryService.Application.Repositories;
 using DirectoryService.Contracts;
 using DirectoryService.Domain.Entities;
+using DirectoryService.Domain.Shared;
 using DirectoryService.Domain.ValueObjects;
 
 namespace DirectoryService.Application;
@@ -18,7 +19,7 @@ public class CreateLocationHandler
     /// <summary>
     /// Метод создает локацию.
     /// </summary>
-    public async Task<Result<Guid>> Handle(CreateLocationRequest request, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Errors>> Handle(CreateLocationRequest request, CancellationToken cancellationToken)
     {
         // Валидация входных параметров
         
@@ -26,9 +27,9 @@ public class CreateLocationHandler
         
         // Создание доменных моделей
         var nameResult = Name.Create(request.Name);
-        
+
         if (nameResult.IsFailure)
-            return Result.Failure<Guid>(nameResult.Error);
+            return nameResult.Error.ToErrors();
 
         var addressResult = Address.Create(
             request.Address.Country, 
@@ -37,14 +38,14 @@ public class CreateLocationHandler
             request.Address.HouseNumber, 
             request.Address.OfficeNumber, 
             request.Address.AdditionalInfo);
-        
+
         if (addressResult.IsFailure)
-            return Result.Failure<Guid>(addressResult.Error);
+            return addressResult.Error.ToErrors();
 
         var timezoneResult = Timezone.Create(request.Timezone);
-        
+
         if (timezoneResult.IsFailure)
-            return Result.Failure<Guid>(timezoneResult.Error);
+            return timezoneResult.Error.ToErrors();
 
         var name = nameResult.Value;
         var address = addressResult.Value;
@@ -53,7 +54,7 @@ public class CreateLocationHandler
         var locationResult = Location.Create(name, address, timezone, true);
 
         if (locationResult.IsFailure)
-            return Result.Failure<Guid>(locationResult.Error);
+            return locationResult.Error.ToErrors();
 
         var location = locationResult.Value;
 

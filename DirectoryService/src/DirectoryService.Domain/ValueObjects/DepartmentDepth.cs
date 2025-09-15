@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Shared;
 
 namespace DirectoryService.Domain.ValueObjects;
 
@@ -11,12 +12,11 @@ public record DepartmentDepth
 
     public int Value { get; }
 
-    public static Result<DepartmentDepth> Create(int depth)
+    public static Result<DepartmentDepth, Error> Create(int depth)
     {
         if (depth < 0)
-            return Result.Failure<DepartmentDepth>("Depth cannot be less than 0!");
+            return Error.Validation(null, "Depth cannot be less than 0!");
 
-        var obj = new DepartmentDepth(depth);
-        return Result.Success(obj);
+        return new DepartmentDepth(depth);
     }
 }
