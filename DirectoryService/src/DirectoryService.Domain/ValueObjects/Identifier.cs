@@ -14,18 +14,17 @@ public record Identifier
 
     public string Value { get; }
 
-    public static Result<Identifier> Create(string identifier)
+    public static Result<Identifier, Error> Create(string identifier)
     {
         if (string.IsNullOrWhiteSpace(identifier))
-            return Result.Failure<Identifier>("Identifier cannot be empty!");
+            return Error.Validation(null, "Identifier cannot be empty!");
 
         if (identifier.Length < Const.Text.MIN_LENGHT || identifier.Length > Const.Text.MAX_LENGHT)
-            return Result.Failure<Identifier>("Incorrect identifier length!");
+            return Error.Validation(null, "Incorrect identifier length!");
 
         if (!Regex.IsMatch(identifier, Const.Regex.LATIN_REGEX))
-            return Result.Failure<Identifier>("The identifier must be in Latin!");
+            return Error.Validation(null, "The identifier must be in Latin!");
 
-        var obj = new Identifier(identifier);
-        return Result.Success(obj);
+        return new Identifier(identifier);
     }
 }

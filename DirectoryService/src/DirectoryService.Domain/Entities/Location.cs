@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Shared;
 using DirectoryService.Domain.ValueObjects;
 
 namespace DirectoryService.Domain.Entities;
@@ -35,9 +36,8 @@ public class Location
 
     public DateTime UpdatedAt { get; private set; }
 
-    public static Result<Location> Create(Name name, Address address, Timezone timeZone, bool isActive)
+    public static Result<Location, Error> Create(Name name, Address address, Timezone timeZone, bool isActive)
     {
-        var obj = new Location(name, address, timeZone, isActive);
-        return Result.Success(obj);
+        return new Location(name, address, timeZone, isActive);
     }
 }

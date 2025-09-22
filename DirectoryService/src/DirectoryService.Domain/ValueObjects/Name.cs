@@ -12,15 +12,15 @@ public record Name
 
     public string Value { get; }
 
-    public static Result<Name> Create(string name)
+    public static Result<Name, Error> Create(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            return Result.Failure<Name>("Name cannot be empty!");
+            return Error.Validation(null, "Name cannot be empty!");
 
         if (name.Length < Const.Text.MIN_LENGHT || name.Length > Const.Text.MAX_LENGHT)
-            return Result.Failure<Name>("Incorrect name length!");
+            return Error.Validation(null, "Incorrect name length!");
 
-        var obj = new Name(name);
-        return Result.Success(obj);
+        return new Name(name);
+
     }
 }
