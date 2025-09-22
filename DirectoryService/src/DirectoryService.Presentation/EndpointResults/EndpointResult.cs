@@ -65,7 +65,7 @@ public sealed class EndpointResult : IResult, IEndpointMetadataProvider
             ? Results.Ok()
             : new ErrorsResult(result.Error);
     }
-
+    
     public Task ExecuteAsync(HttpContext httpContext) =>
         _result.ExecuteAsync(httpContext);
 
