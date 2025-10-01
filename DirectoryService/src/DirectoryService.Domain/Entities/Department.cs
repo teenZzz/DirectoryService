@@ -55,17 +55,17 @@ public class Department
 
     public DateTime UpdatedAt { get; private set; }
 
-    private List<Department> _children;
+    private readonly List<Department> _children;
     
-    public IReadOnlyList<Department> Children => _children = [];
+    public IReadOnlyList<Department> Children => _children;
 
-    private List<DepartmentLocation> _departmentLocations;
+    private readonly List<DepartmentLocation> _departmentLocations;
     
-    public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations = [];
+    public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations;
 
-    private List<DepartmentPosition> _departmentPositions;
+    private readonly List<DepartmentPosition> _departmentPositions;
 
-    public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions = [];
+    public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions;
 
     public static Result<Department, Error> Create(
         Name name, 
