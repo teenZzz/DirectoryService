@@ -4,16 +4,19 @@ using DirectoryService.Contracts;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Shared;
 using DirectoryService.Domain.ValueObjects;
+using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application;
 
 public class CreateLocationHandler
 {
     private readonly ILocationRepository _locationRepository;
-    
-    public CreateLocationHandler(ILocationRepository locationRepository)
+    private readonly ILogger<CreateLocationHandler> _logger;
+
+    public CreateLocationHandler(ILocationRepository locationRepository, ILogger<CreateLocationHandler> logger)
     {
         _locationRepository = locationRepository;
+        _logger = logger;
     }
     
     /// <summary>
@@ -60,6 +63,8 @@ public class CreateLocationHandler
 
         // Сохранение доменных моделей в БД
         await _locationRepository.Add(location, cancellationToken);
+        
+        _logger.LogInformation("Created locations with id {id}", location.Id);
         
         return location.Id;
     }

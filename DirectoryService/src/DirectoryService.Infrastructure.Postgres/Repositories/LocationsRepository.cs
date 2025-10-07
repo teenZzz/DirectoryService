@@ -19,20 +19,11 @@ public class LocationsRepository : ILocationRepository
 
 
     public async Task<Result<Guid, Error>> Add(Location location, CancellationToken cancellationToken)
-    {
-        try
-        {
-            await _dbContext.Locations.AddAsync(location, cancellationToken);
+    { 
+        await _dbContext.Locations.AddAsync(location, cancellationToken);
 
-            await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
-            return location.Id;
-        }
-        catch (Exception ex)
-        {   
-            _logger.LogError(ex, "Fail to insert location");
-
-            return Error.Failure(null, ex.Message);
-        }
+        return location.Id;
     }
 }
