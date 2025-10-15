@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using DirectoryService.Application.Locations;
 using DirectoryService.Application.Repositories;
 using DirectoryService.Contracts;
 using DirectoryService.Domain.Entities;
@@ -22,30 +23,30 @@ public class CreateLocationHandler
     /// <summary>
     /// Метод создает локацию.
     /// </summary>
-    public async Task<Result<Guid, Errors>> Handle(CreateLocationRequest request, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Errors>> Handle(CreateLocationCommand command, CancellationToken cancellationToken)
     {
         // Валидация входных параметров
         
         // Бизнес валидация
         
         // Создание доменных моделей
-        var nameResult = Name.Create(request.Name);
+        var nameResult = Name.Create(command.Request.Name);
 
         if (nameResult.IsFailure)
             return nameResult.Error.ToErrors();
 
         var addressResult = Address.Create(
-            request.Address.Country, 
-            request.Address.City, 
-            request.Address.Street, 
-            request.Address.HouseNumber, 
-            request.Address.OfficeNumber, 
-            request.Address.AdditionalInfo);
+            command.Request.Address.Country, 
+            command.Request.Address.City, 
+            command.Request.Address.Street, 
+            command.Request.Address.HouseNumber, 
+            command.Request.Address.OfficeNumber, 
+            command.Request.Address.AdditionalInfo);
 
         if (addressResult.IsFailure)
             return addressResult.Error.ToErrors();
 
-        var timezoneResult = Timezone.Create(request.Timezone);
+        var timezoneResult = Timezone.Create(command.Request.Timezone);
 
         if (timezoneResult.IsFailure)
             return timezoneResult.Error.ToErrors();
