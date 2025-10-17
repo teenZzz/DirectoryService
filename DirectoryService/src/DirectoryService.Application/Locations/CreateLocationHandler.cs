@@ -80,12 +80,12 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
         // Проверка, что локация с таким именем еще не создана
         var existsByName = await _locationRepository.ExistsByNameAsync(name, cancellationToken);
         if (existsByName.Value == true)
-            return existsByName.Error.ToErrors();
+            return Error.Conflict(null, "A location with this name already exists.").ToErrors();
 
         // Проверка, что локация с таким адресом еще не создана
         var existsByAddress = await _locationRepository.ExistsByAddressAsync(address, cancellationToken);
         if (existsByAddress.Value == true)
-            return existsByAddress.Error.ToErrors();
+            return Error.Conflict(null, "A location with this address already exists.").ToErrors();
 
         var locationResult = Location.Create(name, address, timezone, true);
         if (locationResult.IsFailure)
