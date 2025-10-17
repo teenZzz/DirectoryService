@@ -13,17 +13,17 @@ public record Path
 
     public string Value { get; }
 
-    public static Result<Path, Error> Create(string path)
+    public static Result<Path, Error> Create(string value)
     {
-        if (string.IsNullOrWhiteSpace(path))
+        if (string.IsNullOrWhiteSpace(value))
             return Error.Validation(null, "Path cannot be empty!");
 
-        if (path.Length < Const.Text.MIN_LENGHT || path.Length > Const.Text.MAX_LENGHT)
+        if (value.Length < Const.Text.MIN_LENGHT || value.Length > Const.Text.MAX_LENGHT)
             return Error.Validation(null, "Incorrect path length!");
 
-        if (!Regex.IsMatch(path, Const.Regex.LATIN_REGEX))
+        if (!Regex.IsMatch(value, Const.Regex.LATIN_REGEX))
             return Error.Validation(null, "The path must be in Latin!");
 
-        return new Path(path);
+        return new Path(value);
     }
 }

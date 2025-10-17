@@ -12,11 +12,11 @@ public record DepartmentDepth
 
     public int Value { get; }
 
-    public static Result<DepartmentDepth, Error> Create(int depth)
+    public static Result<DepartmentDepth, Error> Create(int value)
     {
-        if (depth < 0)
+        if (value < 0)
             return Error.Validation(null, "Depth cannot be less than 0!");
 
-        return new DepartmentDepth(depth);
+        return new DepartmentDepth(value);
     }
 }

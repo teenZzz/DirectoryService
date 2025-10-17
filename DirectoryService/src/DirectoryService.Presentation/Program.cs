@@ -1,14 +1,17 @@
 using DirectoryService.Application;
-using DirectoryService.Application.Repositories;
+using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Locations;
 using DirectoryService.Infrastructure.Postgres;
 using DirectoryService.Infrastructure.Postgres.Repositories;
 using DirectoryService.Presentation.Middlewares;
+using FluentValidation;
 using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Logger
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .Enrich.WithExceptionDetails()
@@ -22,19 +25,26 @@ Log.Logger = new LoggerConfiguration()
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
+// DB Context
 builder.Services.AddScoped<DirectoryServiceDbContext>(_ => 
     new DirectoryServiceDbContext(builder.Configuration.GetConnectionString("DirectoryServiceDb")!));
 
+// Repositories
 builder.Services.AddScoped<ILocationRepository, LocationsRepository>();
 
-builder.Services.AddScoped<CreateLocationHandler>();
+// Handlers
+builder.Services.AddScoped<ICommandHandler<Guid, CreateLocationCommand>, CreateLocationHandler>();
 
+// Logger
 builder.Services.AddSerilog();
+
+// Validator
+builder.Services.AddValidatorsFromAssembly(typeof(CreateLocationCommandValidator).Assembly, ServiceLifetime.Scoped);
 
 var app = builder.Build();
 
+// Middleware
 app.UseExceptionMiddleware();
-
 app.UseSerilogRequestLogging();
 
 if (app.Environment.IsDevelopment())
