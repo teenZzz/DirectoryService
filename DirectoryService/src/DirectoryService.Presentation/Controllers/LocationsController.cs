@@ -1,4 +1,5 @@
 ﻿using DirectoryService.Application;
+using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Locations;
 using DirectoryService.Contracts;
 using DirectoryService.Presentation.EndpointResults;
@@ -12,7 +13,7 @@ public class LocationsController : ControllerBase
 {
     [HttpPost]
     public async Task<EndpointResult<Guid>> Create(
-        [FromServices] CreateLocationHandler handler,
+        [FromServices] ICommandHandler<Guid, CreateLocationCommand> handler,
         [FromBody] CreateLocationRequest request,
         CancellationToken cancellationToken)
     {

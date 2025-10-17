@@ -1,23 +1,57 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.Locations;
-using DirectoryService.Application.Repositories;
+using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Validation;
 using DirectoryService.Contracts;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Shared;
 using DirectoryService.Domain.ValueObjects;
+using FluentValidation;
 using Microsoft.Extensions.Logging;
 
-namespace DirectoryService.Application;
+namespace DirectoryService.Application.Locations;
 
-public class CreateLocationHandler
+// Command DTO
+public record CreateLocationCommand(CreateLocationRequest Request) : ICommand;
+
+// Validator
+public class CreateLocationCommandValidator : AbstractValidator<CreateLocationCommand>
+{
+    public CreateLocationCommandValidator()
+    {
+        RuleFor(x => x.Request)
+            .NotNull()
+            .WithError(GeneralErrors.General.ValueIsRequired("request"));
+        
+        RuleFor(x => x.Request.Name)
+            .MustBeValueObject(Name.Create);
+        
+
+        RuleFor(x => x.Request.Address)
+            .MustBeValueObject(a => Address.Create(
+                a.Country,
+                a.City,
+                a.Street,
+                a.HouseNumber,
+                a.OfficeNumber,
+                a.AdditionalInfo));
+
+        RuleFor(x => x.Request.Timezone)
+            .MustBeValueObject(Timezone.Create);
+    }
+}
+
+// Handler
+public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand>
 {
     private readonly ILocationRepository _locationRepository;
     private readonly ILogger<CreateLocationHandler> _logger;
+    private readonly IValidator<CreateLocationCommand> _validator;
 
-    public CreateLocationHandler(ILocationRepository locationRepository, ILogger<CreateLocationHandler> logger)
+    public CreateLocationHandler(ILocationRepository locationRepository, ILogger<CreateLocationHandler> logger, IValidator<CreateLocationCommand> validator)
     {
         _locationRepository = locationRepository;
         _logger = logger;
+        _validator = validator;
     }
     
     /// <summary>
@@ -26,44 +60,41 @@ public class CreateLocationHandler
     public async Task<Result<Guid, Errors>> Handle(CreateLocationCommand command, CancellationToken cancellationToken)
     {
         // Валидация входных параметров
-        
-        // Бизнес валидация
+        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+        if (!validationResult.IsValid)
+            return validationResult.ToList();
         
         // Создание доменных моделей
-        var nameResult = Name.Create(command.Request.Name);
+        var name = Name.Create(command.Request.Name).Value;
 
-        if (nameResult.IsFailure)
-            return nameResult.Error.ToErrors();
-
-        var addressResult = Address.Create(
+        var address = Address.Create(
             command.Request.Address.Country, 
             command.Request.Address.City, 
             command.Request.Address.Street, 
             command.Request.Address.HouseNumber, 
             command.Request.Address.OfficeNumber, 
-            command.Request.Address.AdditionalInfo);
+            command.Request.Address.AdditionalInfo).Value;
+        
+        var timezone = Timezone.Create(command.Request.Timezone).Value;
+        
+        // Проверка, что локация с таким именем еще не создана
+        var existsByName = await _locationRepository.ExistsByNameAsync(name, cancellationToken);
+        if (existsByName.Value == true)
+            return existsByName.Error.ToErrors();
 
-        if (addressResult.IsFailure)
-            return addressResult.Error.ToErrors();
-
-        var timezoneResult = Timezone.Create(command.Request.Timezone);
-
-        if (timezoneResult.IsFailure)
-            return timezoneResult.Error.ToErrors();
-
-        var name = nameResult.Value;
-        var address = addressResult.Value;
-        var timezone = timezoneResult.Value;
+        // Проверка, что локация с таким адресом еще не создана
+        var existsByAddress = await _locationRepository.ExistsByAddressAsync(address, cancellationToken);
+        if (existsByAddress.Value == true)
+            return existsByAddress.Error.ToErrors();
 
         var locationResult = Location.Create(name, address, timezone, true);
-
         if (locationResult.IsFailure)
             return locationResult.Error.ToErrors();
 
         var location = locationResult.Value;
 
         // Сохранение доменных моделей в БД
-        await _locationRepository.Add(location, cancellationToken);
+        await _locationRepository.AddAsync(location, cancellationToken);
         
         _logger.LogInformation("Created locations with id {id}", location.Id);
         
