@@ -32,16 +32,24 @@ public class LocationsRepository : ILocationRepository
     public async Task<Result<bool, Error>> ExistsByNameAsync(Name locationName, CancellationToken cancellationToken)
     {
         bool exists = await _dbContext.Locations
-            .AnyAsync(l => l.Name == locationName, cancellationToken);
+            .AnyAsync(l => l.Name.Value == locationName.Value, cancellationToken);
 
-        return exists == true;
+        return exists;
     }
 
     public async Task<Result<bool, Error>> ExistsByAddressAsync(Address address, CancellationToken cancellationToken)
     {
         bool exists = await _dbContext.Locations
-            .AnyAsync(l => l.Address == address, cancellationToken);
+            .AnyAsync(
+                l =>
+                    l.Address.Country == address.Country &&
+                    l.Address.City == address.City &&
+                    l.Address.Street == address.Street &&
+                    l.Address.HouseNumber == address.HouseNumber &&
+                    l.Address.OfficeNumber == address.OfficeNumber &&
+                    l.Address.AdditionalInfo == address.AdditionalInfo,
+                cancellationToken);
 
-        return exists == true;
+        return exists;
     }
 }

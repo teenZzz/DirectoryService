@@ -49,52 +49,51 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
 
     private static void ConfigureLocationName(EntityTypeBuilder<Location> builder)
     {
-        builder.ComplexProperty(l => l.Name, nb =>
+        builder.OwnsOne(l => l.Name, nb =>
         {
             nb.Property(l => l.Value)
-                .IsRequired()
                 .HasMaxLength(Const.Text.MAX_LENGHT)
                 .HasColumnName("name");
         });
+
+        builder.Navigation(l => l.Name).IsRequired();
     }
 
     private static void ConfigureLocationAddress(EntityTypeBuilder<Location> builder)
     {
-        builder.ComplexProperty(l => l.Address, ab =>
+        builder.OwnsOne(l => l.Address, ab =>
         {
             ab.Property(l => l.Country)
-                .IsRequired()
                 .HasColumnName("country");
 
             ab.Property(l => l.City)
-                .IsRequired()
                 .HasColumnName("city");
 
             ab.Property(l => l.Street)
-                .IsRequired()
                 .HasColumnName("street");
 
             ab.Property(l => l.HouseNumber)
-                .IsRequired()
                 .HasColumnName("house_number");
 
             ab.Property(l => l.OfficeNumber)
-                .IsRequired()
                 .HasColumnName("office_number");
 
             ab.Property(l => l.AdditionalInfo)
-                .IsRequired()
                 .HasColumnName("additional_info");
         });
+
+        builder.Navigation(l => l.Address).IsRequired();
     }
 
     private static void ConfigureLocationTimezone(EntityTypeBuilder<Location> builder)
     {
-        builder.ComplexProperty(l => l.Timezone, tb =>
+        builder.OwnsOne(l => l.Timezone, tb =>
         {
             tb.Property(l => l.Value)
-                .IsRequired()
                 .HasColumnName("timezone");
         });
+
+        builder.Navigation(l => l.Timezone).IsRequired();
     }
+    
 }

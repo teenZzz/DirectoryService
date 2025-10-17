@@ -62,45 +62,53 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 
     private static void ConfigureDepartmentName(EntityTypeBuilder<Department> builder)
     {
-        builder.ComplexProperty(d => d.Name, nb =>
+        builder.OwnsOne(d => d.Name, nb =>
         {
             nb.Property(d => d.Value)
                 .IsRequired()
                 .HasMaxLength(Const.Text.MAX_LENGHT)
                 .HasColumnName("name");
         });
+
+        builder.Navigation(d => d.Name).IsRequired();
     }
 
     private static void ConfigureDepartmentIdentifier(EntityTypeBuilder<Department> builder)
     {
-        builder.ComplexProperty(d => d.Identifier, ib =>
+        builder.OwnsOne(d => d.Identifier, ib =>
         {
             ib.Property(d => d.Value)
                 .IsRequired()
                 .HasMaxLength(Const.Text.MAX_LENGHT)
                 .HasColumnName("identifier");
         });
+
+        builder.Navigation(d => d.Identifier).IsRequired();
     }
     
     private static void ConfigureDepartmentPath(EntityTypeBuilder<Department> builder)
     {
-        builder.ComplexProperty(d => d.Path, pb =>
+        builder.OwnsOne(d => d.Path, pb =>
         {
             pb.Property(d => d.Value)
                 .IsRequired()
                 .HasMaxLength(Const.Text.MAX_LENGHT)
                 .HasColumnName("path");
         });
+
+        builder.Navigation(d => d.Path).IsRequired();
     }
     
     private static void ConfigureDepartmentDepth(EntityTypeBuilder<Department> builder)
     {
-        builder.ComplexProperty(d => d.Depth, db =>
+        builder.OwnsOne(d => d.Depth, db =>
         {
             db.Property(d => d.Value)
                 .IsRequired()
                 .HasColumnName("depth");
         });
+
+        builder.Navigation(d => d.Depth).IsRequired();
     }
 
     private static void ConfigurePositionsRelation(EntityTypeBuilder<Department> builder)

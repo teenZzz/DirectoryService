@@ -15,16 +15,16 @@ public record Timezone
 
     public string Value { get; }
 
-    public static Result<Timezone, Error> Create(string timeZone)
+    public static Result<Timezone, Error> Create(string value)
     {
-        if (string.IsNullOrWhiteSpace(timeZone))
+        if (string.IsNullOrWhiteSpace(value))
             return Error.Validation(null, "Timezone cannot be empty!");
         
-        string trimmed = timeZone.Trim();
+        string trimmed = value.Trim();
 
         if (!_ianaRegex.IsMatch(trimmed))
             return Error.Validation(null, "Timezone must be a valid IANA code!");
 
-        return new Timezone(timeZone);
+        return new Timezone(value);
     }
 }
