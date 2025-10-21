@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DirectoryService.Infrastructure.Postgres.Migrations
 {
     [DbContext(typeof(DirectoryServiceDbContext))]
-    [Migration("20251020064722_Initial")]
+    [Migration("20251021124211_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -36,9 +36,6 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<Guid?>("DepartmentId")
-                        .HasColumnType("uuid");
-
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -55,8 +52,6 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_departments");
-
-                    b.HasIndex("DepartmentId");
 
                     b.HasIndex("ParentId");
 
@@ -161,10 +156,6 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                 {
                     b.HasOne("DirectoryService.Domain.Entities.Department", null)
                         .WithMany("Children")
-                        .HasForeignKey("DepartmentId");
-
-                    b.HasOne("DirectoryService.Domain.Entities.Department", null)
-                        .WithMany()
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Restrict);
 

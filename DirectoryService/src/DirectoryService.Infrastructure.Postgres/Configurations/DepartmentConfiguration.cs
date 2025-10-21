@@ -138,7 +138,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
     private static void ConfigureParentChildRelationship(EntityTypeBuilder<Department> builder)
     {
         builder.HasOne<Department>()
-            .WithMany()
+            .WithMany(d => d.Children)
             .HasForeignKey(v => v.ParentId)
             .OnDelete(DeleteBehavior.Restrict);
     }

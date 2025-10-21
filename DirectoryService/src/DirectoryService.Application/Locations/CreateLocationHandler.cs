@@ -83,6 +83,10 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
 
         // Проверка, что локация с таким адресом еще не создана
         var existsByAddress = await _locationRepository.ExistsByAddressAsync(address, cancellationToken);
+
+        if (existsByAddress.IsFailure)
+            return GeneralErrors.General.Failure().ToErrors();
+        
         if (existsByAddress.Value == true)
             return Error.Conflict(null, "A location with this address already exists.").ToErrors();
 

@@ -33,9 +33,6 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<Guid?>("DepartmentId")
-                        .HasColumnType("uuid");
-
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -52,8 +49,6 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_departments");
-
-                    b.HasIndex("DepartmentId");
 
                     b.HasIndex("ParentId");
 
@@ -158,10 +153,6 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                 {
                     b.HasOne("DirectoryService.Domain.Entities.Department", null)
                         .WithMany("Children")
-                        .HasForeignKey("DepartmentId");
-
-                    b.HasOne("DirectoryService.Domain.Entities.Department", null)
-                        .WithMany()
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Restrict);
 

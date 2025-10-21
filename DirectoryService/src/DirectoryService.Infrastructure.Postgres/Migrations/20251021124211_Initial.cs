@@ -23,17 +23,11 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                     depth = table.Column<int>(type: "integer", nullable: false),
                     is_active = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    DepartmentId = table.Column<Guid>(type: "uuid", nullable: true)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_departments", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_departments_departments_DepartmentId",
-                        column: x => x.DepartmentId,
-                        principalTable: "departments",
-                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_departments_departments_parent_id",
                         column: x => x.parent_id,
@@ -137,11 +131,6 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                 name: "IX_department_positions_position_id",
                 table: "department_positions",
                 column: "position_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_departments_DepartmentId",
-                table: "departments",
-                column: "DepartmentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_departments_parent_id",

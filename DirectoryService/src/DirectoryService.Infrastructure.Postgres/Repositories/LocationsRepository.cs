@@ -54,6 +54,18 @@ public class LocationsRepository : ILocationRepository
 
         return exists;
     }
+    
+    public async Task<Result<bool, Errors>> AllExistAsync(IReadOnlyCollection<Guid> locationIds, CancellationToken cancellationToken)
+    {
+        if (locationIds.Count == 0)
+            return true;
+
+        var existingCount = await _dbContext.Locations
+            .Where(l => locationIds.Contains(l.Id))
+            .CountAsync(cancellationToken);
+
+        return existingCount == locationIds.Count;
+    }
 
     private async Task<UnitResult<Error>> SaveChangesAsync(CancellationToken cancellationToken)
     {

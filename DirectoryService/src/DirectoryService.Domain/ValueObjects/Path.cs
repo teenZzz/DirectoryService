@@ -6,6 +6,8 @@ namespace DirectoryService.Domain.ValueObjects;
 
 public record Path
 {
+    private const char SEPARATOR = '.';
+    
     private Path(string value)
     {
         Value = value;
@@ -25,5 +27,15 @@ public record Path
             return Error.Validation(null, "The path must be in Latin!");
 
         return new Path(value);
+    }
+    
+    public static Path CreateParent(Identifier identifier)
+    {
+        return new Path(identifier.Value);
+    }
+    
+    public Path CreateChild(Identifier childIdentifier)
+    {
+        return new Path(Value + SEPARATOR + childIdentifier.Value);
     }
 }
