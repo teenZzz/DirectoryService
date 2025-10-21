@@ -24,7 +24,6 @@ public class CreateLocationCommandValidator : AbstractValidator<CreateLocationCo
         
         RuleFor(x => x.Request.Name)
             .MustBeValueObject(Name.Create);
-        
 
         RuleFor(x => x.Request.Address)
             .MustBeValueObject(a => Address.Create(

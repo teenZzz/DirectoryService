@@ -23,5 +23,11 @@ public static class GeneralErrors
             string label = name ?? "value";
             return Error.Validation("lenght is invalid", $"{label} lenght is invalid!");
         }
+        
+        public static Error Failure(string? name = null)
+        {
+            string label = name ?? "value";
+            return Error.Validation("operation failure", $"{label} operation failure!");
+        }
     }
 }

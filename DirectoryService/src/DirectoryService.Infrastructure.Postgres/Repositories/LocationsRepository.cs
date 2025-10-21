@@ -4,6 +4,7 @@ using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Shared;
 using DirectoryService.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Postgres.Repositories;
@@ -18,14 +19,15 @@ public class LocationsRepository : ILocationRepository
         _dbContext = dbContext;
         _logger = logger;
     }
-
-
+    
     public async Task<Result<Guid, Error>> AddAsync(Location location, CancellationToken cancellationToken)
     { 
         await _dbContext.Locations.AddAsync(location, cancellationToken);
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
+        var saveResult = await SaveChangesAsync(cancellationToken);
+        if (saveResult.IsFailure)
+            return Error.Failure(null, "Error saving changes!");
+                
         return location.Id;
     }
 
@@ -51,5 +53,19 @@ public class LocationsRepository : ILocationRepository
                 cancellationToken);
 
         return exists;
+    }
+
+    private async Task<UnitResult<Error>> SaveChangesAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return UnitResult.Success<Error>();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error saving changes!");
+            return GeneralErrors.General.Failure();
+        }
     }
 }
