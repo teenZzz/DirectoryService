@@ -12,14 +12,15 @@ public class Position
     {
     }
     
-    private Position(Name name, string? description, bool isActive)
+    private Position(Guid id, Name name, string? description, List<DepartmentPosition> departmentPositions)
     {
-        Id = Guid.NewGuid();
+        Id = id;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
         Name = name;
         Description = description;
-        IsActive = isActive;
+        IsActive = true;
+        _departmentPositions = departmentPositions;
     }
 
     public Guid Id { get; private set; }
@@ -33,9 +34,21 @@ public class Position
     public DateTime CreatedAt { get; private set; }
 
     public DateTime UpdatedAt { get; private set; }
+    
+    private readonly List<DepartmentPosition> _departmentPositions = [];
+    
+    public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions;
 
-    public static Result<Position, Error> Create(Name name, string? description, bool isActive)
+    public static Result<Position, Error> Create(Guid id, Name name, string? description, List<DepartmentPosition> departmentPositions)
     {
-        return new Position(name, description, isActive);
+        if (description != null && description.Length > 1000)
+            return Error.Validation(null, "Incorrect description length!");
+        
+        if (departmentPositions.Count == 0)
+        {
+            return Error.Validation("department.positions", "Department positions must contain at least one location");
+        }
+        
+        return new Position(id, name, description, departmentPositions);
     }
 }

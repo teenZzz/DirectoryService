@@ -59,7 +59,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "position",
+                name: "positions",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -117,7 +117,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                     table.ForeignKey(
                         name: "fk_department_positions_position",
                         column: x => x.position_id,
-                        principalTable: "position",
+                        principalTable: "positions",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -154,7 +154,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                 name: "departments");
 
             migrationBuilder.DropTable(
-                name: "position");
+                name: "positions");
         }
     }
 }

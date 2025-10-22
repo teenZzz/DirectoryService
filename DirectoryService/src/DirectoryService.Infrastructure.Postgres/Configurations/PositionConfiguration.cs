@@ -16,7 +16,7 @@ public class PositionConfiguration : IEntityTypeConfiguration<Position>
 
     private static void ConfigureTable(EntityTypeBuilder<Position> builder)
     {
-        builder.ToTable("position");
+        builder.ToTable("positions");
         builder.HasKey(p => p.Id).HasName("pk_positions");
     }
 

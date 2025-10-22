@@ -12,4 +12,6 @@ public interface IDepartmentRepository
     Task<Result<Department, Errors>> GetById(Guid departmentId, CancellationToken cancellationToken = default);
 
     Task<Result<bool, Error>> ExistsByIdentifierAsync(Identifier identifier, CancellationToken cancellationToken);
+    
+    Task<Result<bool, Errors>> AllExistAndActiveAsync(IReadOnlyCollection<Guid> departmentsId, CancellationToken cancellationToken);
 }

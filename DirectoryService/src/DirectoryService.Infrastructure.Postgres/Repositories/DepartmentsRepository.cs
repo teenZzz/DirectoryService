@@ -9,12 +9,12 @@ using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Postgres.Repositories;
 
-public class DepartmentRepository : IDepartmentRepository
+public class DepartmentsRepository : IDepartmentRepository
 {
     private readonly DirectoryServiceDbContext _dbContext;
-    private readonly ILogger<DepartmentRepository> _logger;
+    private readonly ILogger<DepartmentsRepository> _logger;
     
-    public DepartmentRepository(DirectoryServiceDbContext dbContext, ILogger<DepartmentRepository> logger)
+    public DepartmentsRepository(DirectoryServiceDbContext dbContext, ILogger<DepartmentsRepository> logger)
     {
         _dbContext = dbContext;
         _logger = logger;
@@ -26,7 +26,7 @@ public class DepartmentRepository : IDepartmentRepository
 
         var saveResult = await SaveChangesAsync(cancellationToken);
         if (saveResult.IsFailure)
-            return Error.Failure(null, "Error saving changes!");
+            return saveResult.Error;
                 
         return department.Id;
     }
@@ -48,6 +48,18 @@ public class DepartmentRepository : IDepartmentRepository
             .AnyAsync(d => d.Identifier.Value == identifier.Value, cancellationToken);
         
         return exists;
+    }
+    
+    public async Task<Result<bool, Errors>> AllExistAndActiveAsync(IReadOnlyCollection<Guid> departmentIds, CancellationToken cancellationToken)
+    {
+        if (departmentIds.Count == 0)
+            return true;
+
+        var existingCount = await _dbContext.Departments
+            .Where(d => departmentIds.Contains(d.Id) && d.IsActive)
+            .CountAsync(cancellationToken);
+
+        return existingCount == departmentIds.Count;
     }
     
     private async Task<UnitResult<Error>> SaveChangesAsync(CancellationToken cancellationToken)

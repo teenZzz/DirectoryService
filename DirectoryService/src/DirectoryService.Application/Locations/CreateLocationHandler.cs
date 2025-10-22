@@ -97,7 +97,9 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
         var location = locationResult.Value;
 
         // Сохранение доменных моделей в БД
-        await _locationRepository.AddAsync(location, cancellationToken);
+        var addResult = await _locationRepository.AddAsync(location, cancellationToken);
+        if (addResult.IsFailure)
+            return addResult.Error.ToErrors();
         
         _logger.LogInformation("Created locations with id {id}", location.Id);
         

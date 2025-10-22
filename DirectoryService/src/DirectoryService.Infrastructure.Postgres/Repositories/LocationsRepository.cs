@@ -26,7 +26,7 @@ public class LocationsRepository : ILocationRepository
 
         var saveResult = await SaveChangesAsync(cancellationToken);
         if (saveResult.IsFailure)
-            return Error.Failure(null, "Error saving changes!");
+            return saveResult.Error;
                 
         return location.Id;
     }

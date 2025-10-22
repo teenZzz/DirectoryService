@@ -2,6 +2,7 @@ using DirectoryService.Application;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Departments;
 using DirectoryService.Application.Locations;
+using DirectoryService.Application.Positions;
 using DirectoryService.Infrastructure.Postgres;
 using DirectoryService.Infrastructure.Postgres.Repositories;
 using DirectoryService.Presentation.Middlewares;
@@ -33,17 +34,21 @@ builder.Services.AddScoped<DirectoryServiceDbContext>(_ =>
 
 // Repositories
 builder.Services.AddScoped<ILocationRepository, LocationsRepository>();
-builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+builder.Services.AddScoped<IDepartmentRepository, DepartmentsRepository>();
+builder.Services.AddScoped<IPositionRepository, PositionsRepository>();
 
 // Handlers
 builder.Services.AddScoped<ICommandHandler<Guid, CreateLocationCommand>, CreateLocationHandler>();
 builder.Services.AddScoped<ICommandHandler<Guid, CreateDepartmentCommand>, CreateDepartmentHandler>();
+builder.Services.AddScoped<ICommandHandler<Guid, CreatePositionCommand>, CreatePositionHandler>();
 
 // Logger
 builder.Services.AddSerilog();
 
 // Validator
 builder.Services.AddValidatorsFromAssembly(typeof(CreateLocationCommandValidator).Assembly, ServiceLifetime.Scoped);
+builder.Services.AddValidatorsFromAssembly(typeof(CreateDepartmentCommandValidator).Assembly, ServiceLifetime.Scoped);
+builder.Services.AddValidatorsFromAssembly(typeof(CreatePositionCommandValidator).Assembly, ServiceLifetime.Scoped);
 
 var app = builder.Build();
 

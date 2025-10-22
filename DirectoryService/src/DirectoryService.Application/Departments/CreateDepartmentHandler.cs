@@ -106,7 +106,7 @@ public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCom
             return allLocationsExistResult.Error;
         
         if (!allLocationsExistResult.Value)
-            return Error.NotFound("locations.not.found", "Одна или несколько локаций не найдены").ToErrors();
+            return Error.NotFound("locations.not.found", "Locations not found.").ToErrors();
 
         // Создание DepartmentLocations
         var departmentLocations = command.Request.LocationIds.Select(li => DepartmentLocation.Create(id, li).Value).ToList();
@@ -119,7 +119,9 @@ public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCom
         if (department.IsFailure)
             return department.Error.ToErrors();
 
-        await _departmentRepository.AddAsync(department.Value, cancellationToken);
+        var addResult = await _departmentRepository.AddAsync(department.Value, cancellationToken);
+        if (addResult.IsFailure)
+            return addResult.Error.ToErrors();
         
         _logger.LogInformation("Created department with id {id}", department.Value.Id);
 
