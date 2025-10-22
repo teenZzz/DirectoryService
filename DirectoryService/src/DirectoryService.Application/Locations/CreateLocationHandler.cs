@@ -24,7 +24,6 @@ public class CreateLocationCommandValidator : AbstractValidator<CreateLocationCo
         
         RuleFor(x => x.Request.Name)
             .MustBeValueObject(Name.Create);
-        
 
         RuleFor(x => x.Request.Address)
             .MustBeValueObject(a => Address.Create(
@@ -84,6 +83,10 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
 
         // Проверка, что локация с таким адресом еще не создана
         var existsByAddress = await _locationRepository.ExistsByAddressAsync(address, cancellationToken);
+
+        if (existsByAddress.IsFailure)
+            return GeneralErrors.General.Failure().ToErrors();
+        
         if (existsByAddress.Value == true)
             return Error.Conflict(null, "A location with this address already exists.").ToErrors();
 
@@ -94,7 +97,9 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
         var location = locationResult.Value;
 
         // Сохранение доменных моделей в БД
-        await _locationRepository.AddAsync(location, cancellationToken);
+        var addResult = await _locationRepository.AddAsync(location, cancellationToken);
+        if (addResult.IsFailure)
+            return addResult.Error.ToErrors();
         
         _logger.LogInformation("Created locations with id {id}", location.Id);
         

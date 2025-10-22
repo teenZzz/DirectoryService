@@ -4,7 +4,7 @@ public static class Const
 {
     public static class Text
     {
-        public const int MIN_LENGHT = 3;
+        public const int MIN_LENGHT = 2;
 
         public const int MAX_LENGHT = 150;
     }

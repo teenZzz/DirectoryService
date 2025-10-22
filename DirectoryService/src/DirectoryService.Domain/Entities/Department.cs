@@ -13,17 +13,15 @@ public class Department
     }
     
     private Department(
+        Guid id,
         Name name, 
         Identifier identifier, 
         Guid? parentId, 
         Path path,
         DepartmentDepth depth,
-        bool isActive, 
-        List<Department> children, 
-        List<DepartmentLocation> departmentLocations, 
-        List<DepartmentPosition> departmentPositions)
+        List<DepartmentLocation> departmentLocations)
     {
-        Id = Guid.NewGuid();
+        Id = id;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
         Name = name;
@@ -31,10 +29,8 @@ public class Department
         ParentId = parentId;
         Path = path;
         Depth = depth;
-        IsActive = isActive;
-        _children = children;
+        IsActive = true;
         _departmentLocations = departmentLocations;
-        _departmentPositions = departmentPositions;
     }
 
     public Guid Id { get; private set; }
@@ -55,37 +51,53 @@ public class Department
 
     public DateTime UpdatedAt { get; private set; }
 
-    private readonly List<Department> _children;
+    private readonly List<Department> _children = [];
     
     public IReadOnlyList<Department> Children => _children;
 
-    private readonly List<DepartmentLocation> _departmentLocations;
+    private readonly List<DepartmentLocation> _departmentLocations = [];
     
     public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations;
 
-    private readonly List<DepartmentPosition> _departmentPositions;
+    private readonly List<DepartmentPosition> _departmentPositions = [];
 
     public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions;
 
-    public static Result<Department, Error> Create(
+    public static Result<Department, Error> CreateParent(
+        Guid id,
         Name name, 
         Identifier identifier, 
-        Guid? parentId, 
-        Path path, 
-        DepartmentDepth depth, 
-        bool isActive, 
-        List<Department> children, 
-        List<DepartmentLocation> departmentLocations, 
-        List<DepartmentPosition> departmentPositions)
+        List<DepartmentLocation> departmentLocations)
     {
-        if (departmentLocations == null)
-            return Error.Validation(null, "DepartmentLocations cannot be null!");
-
-        if (departmentPositions == null)
-            return Error.Validation(null, "DepartmentPosition cannot be null!");
-
-        return new Department(name, identifier, parentId, path, depth, isActive, children, departmentLocations, departmentPositions);
+        if (departmentLocations.Count == 0)
+        {
+            return Error.Validation("department.location", "Department locations must contain at least one location");
+        }
         
+        var path = Path.CreateParent(identifier);
+
+        var depth = DepartmentDepth.Create(0).Value;
+        
+        return new Department(id, name, identifier, null, path, depth, departmentLocations);
+    }
+
+    public static Result<Department, Error> CreateChild(
+        Guid id,
+        Name name, 
+        Identifier identifier,
+        Department parent,
+        List<DepartmentLocation> departmentLocations)
+    {
+        if (departmentLocations.Count == 0)
+        {
+            return Error.Validation("department.location", "Department locations must contain at least one location");
+        }
+
+        var depth = DepartmentDepth.Create(parent.Depth.Value + 1).Value;
+        
+        var path = parent.Path.CreateChild(identifier);
+
+        return new Department(id, name, identifier, parent.Id, path, depth, departmentLocations);
     }
 
 }

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DirectoryService.Infrastructure.Postgres.Migrations
 {
     [DbContext(typeof(DirectoryServiceDbContext))]
-    [Migration("20251020064722_Initial")]
+    [Migration("20251022104328_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -36,9 +36,6 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<Guid?>("DepartmentId")
-                        .HasColumnType("uuid");
-
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -55,8 +52,6 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_departments");
-
-                    b.HasIndex("DepartmentId");
 
                     b.HasIndex("ParentId");
 
@@ -154,17 +149,13 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                     b.HasKey("Id")
                         .HasName("pk_positions");
 
-                    b.ToTable("position", (string)null);
+                    b.ToTable("positions", (string)null);
                 });
 
             modelBuilder.Entity("DirectoryService.Domain.Entities.Department", b =>
                 {
                     b.HasOne("DirectoryService.Domain.Entities.Department", null)
                         .WithMany("Children")
-                        .HasForeignKey("DepartmentId");
-
-                    b.HasOne("DirectoryService.Domain.Entities.Department", null)
-                        .WithMany()
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
@@ -280,7 +271,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .IsRequired();
 
                     b.HasOne("DirectoryService.Domain.Entities.Position", null)
-                        .WithMany()
+                        .WithMany("DepartmentPositions")
                         .HasForeignKey("PositionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -392,7 +383,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
 
                             b1.HasKey("PositionId");
 
-                            b1.ToTable("position");
+                            b1.ToTable("positions");
 
                             b1.WithOwner()
                                 .HasForeignKey("PositionId");
@@ -408,6 +399,11 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
 
                     b.Navigation("DepartmentLocations");
 
+                    b.Navigation("DepartmentPositions");
+                });
+
+            modelBuilder.Entity("DirectoryService.Domain.Entities.Position", b =>
+                {
                     b.Navigation("DepartmentPositions");
                 });
 #pragma warning restore 612, 618
