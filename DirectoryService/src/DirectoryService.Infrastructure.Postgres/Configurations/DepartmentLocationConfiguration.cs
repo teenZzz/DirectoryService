@@ -10,7 +10,11 @@ public class DepartmentLocationConfiguration : IEntityTypeConfiguration<Departme
     {
         builder.ToTable("department_locations");
 
-        builder.HasKey(dl => new { dl.DepartmentId, dl.LocationId }).HasName("pk_department_locations");
+        builder.HasKey(dl => dl.Id).HasName("pk_department_locations");
+
+        builder.Property(dl => dl.Id)
+            .IsRequired()
+            .HasColumnName("id");
 
         builder.Property(dl => dl.DepartmentId)
             .IsRequired()
@@ -19,11 +23,5 @@ public class DepartmentLocationConfiguration : IEntityTypeConfiguration<Departme
         builder.Property(dl => dl.LocationId)
             .IsRequired()
             .HasColumnName("location_id");
-
-        builder.HasOne<Location>()
-            .WithMany()
-            .HasForeignKey(dl => dl.LocationId)
-            .OnDelete(DeleteBehavior.Cascade)
-            .HasConstraintName("fk_department_locations_location");
     }
 }

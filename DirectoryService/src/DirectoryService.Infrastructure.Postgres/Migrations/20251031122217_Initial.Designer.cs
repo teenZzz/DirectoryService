@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DirectoryService.Infrastructure.Postgres.Migrations
 {
     [DbContext(typeof(DirectoryServiceDbContext))]
-    [Migration("20251022104328_Initial")]
+    [Migration("20251031122217_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -23,6 +23,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                 .HasAnnotation("ProductVersion", "9.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "ltree");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("DirectoryService.Domain.Entities.Department", b =>
@@ -36,30 +37,63 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
+                    b.Property<Guid?>("DepartmentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Depth")
+                        .HasColumnType("integer")
+                        .HasColumnName("depth");
+
+                    b.Property<string>("Identifier")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("identifier");
+
                     b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasDefaultValue(true)
                         .HasColumnName("is_active");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("name");
 
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uuid")
                         .HasColumnName("parent_id");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("ltree")
+                        .HasColumnName("path");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
-                        .HasName("pk_departments");
+                        .HasName("pk_department");
 
-                    b.HasIndex("ParentId");
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("Path")
+                        .HasDatabaseName("idx_departments_path");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Path"), "gist");
 
                     b.ToTable("departments", (string)null);
                 });
 
             modelBuilder.Entity("DirectoryService.Domain.Entities.DepartmentLocation", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
                     b.Property<Guid>("DepartmentId")
                         .HasColumnType("uuid")
                         .HasColumnName("department_id");
@@ -68,8 +102,10 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("location_id");
 
-                    b.HasKey("DepartmentId", "LocationId")
+                    b.HasKey("Id")
                         .HasName("pk_department_locations");
+
+                    b.HasIndex("DepartmentId");
 
                     b.HasIndex("LocationId");
 
@@ -78,6 +114,11 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
 
             modelBuilder.Entity("DirectoryService.Domain.Entities.DepartmentPosition", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
                     b.Property<Guid>("DepartmentId")
                         .HasColumnType("uuid")
                         .HasColumnName("department_id");
@@ -86,8 +127,10 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("position_id");
 
-                    b.HasKey("DepartmentId", "PositionId")
+                    b.HasKey("Id")
                         .HasName("pk_department_positions");
+
+                    b.HasIndex("DepartmentId");
 
                     b.HasIndex("PositionId");
 
@@ -106,10 +149,19 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .HasColumnName("created_at");
 
                     b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasDefaultValue(true)
                         .HasColumnName("is_active");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Timezone")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("timezone");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -117,6 +169,9 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_locations");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("locations", (string)null);
                 });
@@ -133,14 +188,19 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .HasColumnName("created_at");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
                         .HasColumnName("description");
 
                     b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasDefaultValue(true)
                         .HasColumnName("is_active");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("name");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -156,94 +216,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                 {
                     b.HasOne("DirectoryService.Domain.Entities.Department", null)
                         .WithMany("Children")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.OwnsOne("DirectoryService.Domain.ValueObjects.Name", "Name", b1 =>
-                        {
-                            b1.Property<Guid>("DepartmentId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(150)
-                                .HasColumnType("character varying(150)")
-                                .HasColumnName("name");
-
-                            b1.HasKey("DepartmentId");
-
-                            b1.ToTable("departments");
-
-                            b1.WithOwner()
-                                .HasForeignKey("DepartmentId");
-                        });
-
-                    b.OwnsOne("DirectoryService.Domain.ValueObjects.DepartmentDepth", "Depth", b1 =>
-                        {
-                            b1.Property<Guid>("DepartmentId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<int>("Value")
-                                .HasColumnType("integer")
-                                .HasColumnName("depth");
-
-                            b1.HasKey("DepartmentId");
-
-                            b1.ToTable("departments");
-
-                            b1.WithOwner()
-                                .HasForeignKey("DepartmentId");
-                        });
-
-                    b.OwnsOne("DirectoryService.Domain.ValueObjects.Identifier", "Identifier", b1 =>
-                        {
-                            b1.Property<Guid>("DepartmentId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(150)
-                                .HasColumnType("character varying(150)")
-                                .HasColumnName("identifier");
-
-                            b1.HasKey("DepartmentId");
-
-                            b1.ToTable("departments");
-
-                            b1.WithOwner()
-                                .HasForeignKey("DepartmentId");
-                        });
-
-                    b.OwnsOne("DirectoryService.Domain.ValueObjects.Path", "Path", b1 =>
-                        {
-                            b1.Property<Guid>("DepartmentId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(150)
-                                .HasColumnType("character varying(150)")
-                                .HasColumnName("path");
-
-                            b1.HasKey("DepartmentId");
-
-                            b1.ToTable("departments");
-
-                            b1.WithOwner()
-                                .HasForeignKey("DepartmentId");
-                        });
-
-                    b.Navigation("Depth")
-                        .IsRequired();
-
-                    b.Navigation("Identifier")
-                        .IsRequired();
-
-                    b.Navigation("Name")
-                        .IsRequired();
-
-                    b.Navigation("Path")
-                        .IsRequired();
+                        .HasForeignKey("DepartmentId");
                 });
 
             modelBuilder.Entity("DirectoryService.Domain.Entities.DepartmentLocation", b =>
@@ -255,11 +228,10 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .IsRequired();
 
                     b.HasOne("DirectoryService.Domain.Entities.Location", null)
-                        .WithMany()
+                        .WithMany("DepartmentLocations")
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_department_locations_location");
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DirectoryService.Domain.Entities.DepartmentPosition", b =>
@@ -274,31 +246,11 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .WithMany("DepartmentPositions")
                         .HasForeignKey("PositionId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_department_positions_position");
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DirectoryService.Domain.Entities.Location", b =>
                 {
-                    b.OwnsOne("DirectoryService.Domain.ValueObjects.Name", "Name", b1 =>
-                        {
-                            b1.Property<Guid>("LocationId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(150)
-                                .HasColumnType("character varying(150)")
-                                .HasColumnName("name");
-
-                            b1.HasKey("LocationId");
-
-                            b1.ToTable("locations");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
-                        });
-
                     b.OwnsOne("DirectoryService.Domain.ValueObjects.Address", "Address", b1 =>
                         {
                             b1.Property<Guid>("LocationId")
@@ -340,56 +292,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                                 .HasForeignKey("LocationId");
                         });
 
-                    b.OwnsOne("DirectoryService.Domain.ValueObjects.Timezone", "Timezone", b1 =>
-                        {
-                            b1.Property<Guid>("LocationId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("timezone");
-
-                            b1.HasKey("LocationId");
-
-                            b1.ToTable("locations");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
-                        });
-
                     b.Navigation("Address")
-                        .IsRequired();
-
-                    b.Navigation("Name")
-                        .IsRequired();
-
-                    b.Navigation("Timezone")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("DirectoryService.Domain.Entities.Position", b =>
-                {
-                    b.OwnsOne("DirectoryService.Domain.ValueObjects.Name", "Name", b1 =>
-                        {
-                            b1.Property<Guid>("PositionId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(150)
-                                .HasColumnType("character varying(150)")
-                                .HasColumnName("name");
-
-                            b1.HasKey("PositionId");
-
-                            b1.ToTable("positions");
-
-                            b1.WithOwner()
-                                .HasForeignKey("PositionId");
-                        });
-
-                    b.Navigation("Name")
                         .IsRequired();
                 });
 
@@ -400,6 +303,11 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                     b.Navigation("DepartmentLocations");
 
                     b.Navigation("DepartmentPositions");
+                });
+
+            modelBuilder.Entity("DirectoryService.Domain.Entities.Location", b =>
+                {
+                    b.Navigation("DepartmentLocations");
                 });
 
             modelBuilder.Entity("DirectoryService.Domain.Entities.Position", b =>

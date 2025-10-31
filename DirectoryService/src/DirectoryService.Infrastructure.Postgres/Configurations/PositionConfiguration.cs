@@ -1,6 +1,7 @@
 ﻿using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Shared;
 using Microsoft.EntityFrameworkCore;
+using DirectoryService.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DirectoryService.Infrastructure.Postgres.Configurations;
@@ -9,55 +10,44 @@ public class PositionConfiguration : IEntityTypeConfiguration<Position>
 {
     public void Configure(EntityTypeBuilder<Position> builder)
     {
-        ConfigureTable(builder);
-        ConfigureProperties(builder);
-        ConfigureValueObjects(builder);
-    }
-
-    private static void ConfigureTable(EntityTypeBuilder<Position> builder)
-    {
         builder.ToTable("positions");
-        builder.HasKey(p => p.Id).HasName("pk_positions");
-    }
 
-    private static void ConfigureProperties(EntityTypeBuilder<Position> builder)
-    {
-        builder.Property(p => p.Id)
+        builder.HasKey(x => x.Id).HasName("pk_positions");
+
+        builder.Property(x => x.Id)
             .IsRequired()
             .HasColumnName("id");
-
-        builder.Property(p => p.Description)
-            .IsRequired(false)
-            .HasColumnName("description");
-
-        builder.Property(p => p.IsActive)
-            .IsRequired()
-            .HasColumnName("is_active")
-            .HasDefaultValue(true);
         
-        builder.Property(p => p.CreatedAt)
+        builder.Property(x => x.Name)
+            .HasConversion(x => x.Value, name => Name.Create(name).Value)
+            .HasColumnName("name")
             .IsRequired()
-            .HasColumnName("created_at");
+            .HasMaxLength(150);
 
-        builder.Property(p => p.UpdatedAt)
-            .IsRequired()
-            .HasColumnName("updated_at");
+        builder.Property(x => x.Description)
+            .IsRequired(false)
+            .HasColumnName("description")
+            .HasMaxLength(1000);
+        
+        builder
+            .Property(p => p.IsActive)
+            .HasColumnName("is_active")
+            .IsRequired();
+        
+        builder
+            .Property(p => p.CreatedAt)
+            .HasColumnName("created_at")
+            .IsRequired();
+        
+        builder
+            .Property(p => p.UpdatedAt)
+            .HasColumnName("updated_at")
+            .IsRequired();
+        
+        builder
+            .HasMany(p => p.DepartmentPositions)
+            .WithOne()
+            .HasForeignKey(dp => dp.PositionId);
     }
-
-    private static void ConfigureValueObjects(EntityTypeBuilder<Position> builder)
-    {
-        ConfigurePositionName(builder);
-    }
-
-    private static void ConfigurePositionName(EntityTypeBuilder<Position> builder)
-    {
-        builder.OwnsOne(p => p.Name, nb =>
-        {
-            nb.Property(p => p.Value)
-                .HasMaxLength(Const.Text.MAX_LENGHT)
-                .HasColumnName("name");
-        });
-
-        builder.Navigation(p => p.Name).IsRequired();
-    }
+    
 }

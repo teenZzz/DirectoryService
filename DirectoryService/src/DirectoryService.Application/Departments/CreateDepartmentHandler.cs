@@ -109,7 +109,7 @@ public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCom
             return Error.NotFound("locations.not.found", "Locations not found.").ToErrors();
 
         // Создание DepartmentLocations
-        var departmentLocations = command.Request.LocationIds.Select(li => DepartmentLocation.Create(id, li).Value).ToList();
+        var departmentLocations = command.Request.LocationIds.Select(li => new DepartmentLocation(id, li)).ToList();
         
         // Создание Department
         var department = parent is null

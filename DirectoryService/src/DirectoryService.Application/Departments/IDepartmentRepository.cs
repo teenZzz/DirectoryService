@@ -14,4 +14,6 @@ public interface IDepartmentRepository
     Task<Result<bool, Error>> ExistsByIdentifierAsync(Identifier identifier, CancellationToken cancellationToken);
     
     Task<Result<bool, Errors>> AllExistAndActiveAsync(IReadOnlyCollection<Guid> departmentsId, CancellationToken cancellationToken);
+
+    Task<UnitResult<Error>> SaveChangesAsync(CancellationToken cancellationToken);
 }

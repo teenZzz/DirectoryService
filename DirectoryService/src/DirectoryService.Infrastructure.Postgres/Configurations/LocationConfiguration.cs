@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Shared;
+using DirectoryService.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,91 +10,71 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
 {
     public void Configure(EntityTypeBuilder<Location> builder)
     {
-        ConfigureTable(builder);
-        ConfigureProperties(builder);
-        ConfigureValueObjects(builder);
-    }
-
-    private static void ConfigureTable(EntityTypeBuilder<Location> builder)
-    {
         builder.ToTable("locations");
-        builder.HasKey(l => l.Id).HasName("pk_locations");
-    }
 
-    private static void ConfigureProperties(EntityTypeBuilder<Location> builder)
-    {
-        builder.Property(l => l.Id)
+        builder.HasKey(x => x.Id).HasName("pk_locations");
+
+        builder.Property(x => x.Id)
             .IsRequired()
             .HasColumnName("id");
 
-        builder.Property(l => l.IsActive)
+        builder.Property(x => x.Name)
+            .HasConversion(x => x.Value, name => Name.Create(name).Value)
+            .HasColumnName("name")
             .IsRequired()
-            .HasColumnName("is_active")
-            .HasDefaultValue(true);
+            .HasMaxLength(150);
+        
+        builder.HasIndex(l => l.Name).IsUnique();
 
-        builder.Property(l => l.CreatedAt)
-            .IsRequired()
-            .HasColumnName("created_at");
-
-        builder.Property(l => l.UpdatedAt)
-            .IsRequired()
-            .HasColumnName("updated_at");
-    }
-
-    private static void ConfigureValueObjects(EntityTypeBuilder<Location> builder)
-    {
-        ConfigureLocationName(builder);
-        ConfigureLocationAddress(builder);
-        ConfigureLocationTimezone(builder);
-    }
-
-    private static void ConfigureLocationName(EntityTypeBuilder<Location> builder)
-    {
-        builder.OwnsOne(l => l.Name, nb =>
-        {
-            nb.Property(l => l.Value)
-                .HasMaxLength(Const.Text.MAX_LENGHT)
-                .HasColumnName("name");
-        });
-
-        builder.Navigation(l => l.Name).IsRequired();
-    }
-
-    private static void ConfigureLocationAddress(EntityTypeBuilder<Location> builder)
-    {
-        builder.OwnsOne(l => l.Address, ab =>
+        builder.OwnsOne(x => x.Address, ab =>
         {
             ab.Property(l => l.Country)
+                .IsRequired()
                 .HasColumnName("country");
 
             ab.Property(l => l.City)
+                .IsRequired()
                 .HasColumnName("city");
 
             ab.Property(l => l.Street)
+                .IsRequired()
                 .HasColumnName("street");
 
             ab.Property(l => l.HouseNumber)
+                .IsRequired()
                 .HasColumnName("house_number");
 
             ab.Property(l => l.OfficeNumber)
+                .IsRequired(false)
                 .HasColumnName("office_number");
 
             ab.Property(l => l.AdditionalInfo)
+                .IsRequired(false)
                 .HasColumnName("additional_info");
         });
 
-        builder.Navigation(l => l.Address).IsRequired();
-    }
+        builder.Property(x => x.Timezone)
+            .HasConversion(x => x.Value, timezone => Timezone.Create(timezone).Value)
+            .IsRequired()
+            .HasColumnName("timezone");
+        
+        builder.Property(l => l.IsActive)
+            .HasColumnName("is_active")
+            .IsRequired();
+        
+        builder.Property(l => l.CreatedAt)
+            .HasColumnName("created_at")
+            .IsRequired();
+        
+        builder.Property(l => l.UpdatedAt)
+            .HasColumnName("updated_at")
+            .IsRequired();
+        
+        builder
+            .HasMany(l => l.DepartmentLocations)
+            .WithOne()
+            .HasForeignKey(dl => dl.LocationId);
 
-    private static void ConfigureLocationTimezone(EntityTypeBuilder<Location> builder)
-    {
-        builder.OwnsOne(l => l.Timezone, tb =>
-        {
-            tb.Property(l => l.Value)
-                .HasColumnName("timezone");
-        });
-
-        builder.Navigation(l => l.Timezone).IsRequired();
     }
     
 }

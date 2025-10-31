@@ -2,6 +2,7 @@
 using DirectoryService.Application.Departments;
 using DirectoryService.Application.Locations;
 using DirectoryService.Contracts;
+using DirectoryService.Contracts.Requests;
 using DirectoryService.Presentation.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,19 @@ public class DepartmentsController
     {
         var command = new CreateDepartmentCommand(request);
         
+        return await handler.Handle(command, cancellationToken);
+    }
+    
+    [HttpPut("{departmentId}/locations")]
+    public async Task<EndpointResult<Guid>> UpdateDepartmentLocations(
+        Guid departmentId,
+        [FromServices] ICommandHandler<Guid, UpdateDepartmentLocationsCommand> handler,
+        [FromBody] List<Guid> locationIds,
+        CancellationToken cancellationToken)
+    {
+        var request = new UpdateDepartmentLocationsRequest(departmentId, locationIds);
+        var command = new UpdateDepartmentLocationsCommand(request);
+
         return await handler.Handle(command, cancellationToken);
     }
 }

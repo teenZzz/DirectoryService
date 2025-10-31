@@ -6,22 +6,20 @@ namespace DirectoryService.Domain.Entities;
 public class DepartmentLocation
 {
     // EF Core
-    private DepartmentLocation()
+    public DepartmentLocation()
     {
     }
     
-    private DepartmentLocation(Guid departmentId, Guid locationId)
+    public DepartmentLocation(Guid departmentId, Guid locationId)
     {
         DepartmentId = departmentId;
         LocationId = locationId;
     }
 
+    public Guid Id { get; private set; }
+
     public Guid DepartmentId { get; private set; }
 
     public Guid LocationId { get; private set; }
-
-    public static Result<DepartmentLocation, Error> Create(Guid departmentId, Guid locationId)
-    {
-        return new DepartmentLocation(departmentId, locationId);
-    }
+    
 }

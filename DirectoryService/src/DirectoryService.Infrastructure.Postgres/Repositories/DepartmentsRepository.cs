@@ -34,6 +34,7 @@ public class DepartmentsRepository : IDepartmentRepository
     public async Task<Result<Department, Errors>> GetById(Guid departmentId, CancellationToken cancellationToken)
     {
         var department = await _dbContext.Departments
+            .Include(d => d.DepartmentLocations)
             .FirstOrDefaultAsync(d => d.Id == departmentId, cancellationToken);
 
         if (department is null)
@@ -45,7 +46,7 @@ public class DepartmentsRepository : IDepartmentRepository
     public async Task<Result<bool, Error>> ExistsByIdentifierAsync(Identifier identifier, CancellationToken cancellationToken)
     {
         bool exists = await _dbContext.Departments
-            .AnyAsync(d => d.Identifier.Value == identifier.Value, cancellationToken);
+            .AnyAsync(d => d.Identifier == identifier, cancellationToken);
         
         return exists;
     }
@@ -61,8 +62,8 @@ public class DepartmentsRepository : IDepartmentRepository
 
         return existingCount == departmentIds.Count;
     }
-    
-    private async Task<UnitResult<Error>> SaveChangesAsync(CancellationToken cancellationToken)
+
+    public async Task<UnitResult<Error>> SaveChangesAsync(CancellationToken cancellationToken)
     {
         try
         {
