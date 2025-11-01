@@ -11,6 +11,8 @@ public class Location
     {
     }
     
+    private List<DepartmentLocation> _departments;
+    
     private Location(Name name, Address address, Timezone timeZone, bool isActive)
     {
         Id = Guid.NewGuid();
@@ -35,7 +37,9 @@ public class Location
     public DateTime CreatedAt { get; private set; }
 
     public DateTime UpdatedAt { get; private set; }
-
+    
+    public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departments = [];
+    
     public static Result<Location, Error> Create(Name name, Address address, Timezone timeZone, bool isActive)
     {
         return new Location(name, address, timeZone, isActive);

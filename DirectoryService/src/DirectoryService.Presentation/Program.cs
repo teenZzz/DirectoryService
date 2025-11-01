@@ -41,6 +41,7 @@ builder.Services.AddScoped<IPositionRepository, PositionsRepository>();
 builder.Services.AddScoped<ICommandHandler<Guid, CreateLocationCommand>, CreateLocationHandler>();
 builder.Services.AddScoped<ICommandHandler<Guid, CreateDepartmentCommand>, CreateDepartmentHandler>();
 builder.Services.AddScoped<ICommandHandler<Guid, CreatePositionCommand>, CreatePositionHandler>();
+builder.Services.AddScoped<ICommandHandler<Guid, UpdateDepartmentLocationsCommand>, UpdateDepartmentLocationsHandler>();
 
 // Logger
 builder.Services.AddSerilog();
@@ -49,6 +50,7 @@ builder.Services.AddSerilog();
 builder.Services.AddValidatorsFromAssembly(typeof(CreateLocationCommandValidator).Assembly, ServiceLifetime.Scoped);
 builder.Services.AddValidatorsFromAssembly(typeof(CreateDepartmentCommandValidator).Assembly, ServiceLifetime.Scoped);
 builder.Services.AddValidatorsFromAssembly(typeof(CreatePositionCommandValidator).Assembly, ServiceLifetime.Scoped);
+builder.Services.AddValidatorsFromAssembly(typeof(UpdateDepartmentLocationsCommandValidator).Assembly, ServiceLifetime.Scoped);
 
 var app = builder.Build();
 

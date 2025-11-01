@@ -79,7 +79,7 @@ public class CreatePositionHandler : ICommandHandler<Guid, CreatePositionCommand
         string? description = command.Request.Description;
         
         // Проверка, что name не существует
-        var nameExistsAndActive = await _positionRepository.NameExistAndActiveAsync(name.Value, cancellationToken);
+        var nameExistsAndActive = await _positionRepository.NameExistAndActiveAsync(name, cancellationToken);
 
         if (nameExistsAndActive.IsFailure)
             return nameExistsAndActive.Error.ToErrors();
@@ -98,7 +98,7 @@ public class CreatePositionHandler : ICommandHandler<Guid, CreatePositionCommand
             return Error.NotFound("departments.not.found", "Departments not found.").ToErrors();
 
         // Создание DepartmentPositions
-        var departmentPositions = command.Request.DepartmentIds.Select(di => DepartmentPosition.Create(di, id).Value).ToList();
+        var departmentPositions = command.Request.DepartmentIds.Select(di => new DepartmentPosition(di, id)).ToList();
 
         // Создание Positions
         var position = Position.Create(id, name, description, departmentPositions);

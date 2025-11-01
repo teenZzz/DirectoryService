@@ -12,6 +12,8 @@ public class Position
     {
     }
     
+    private readonly List<DepartmentPosition> _departments = [];
+    
     private Position(Guid id, Name name, string? description, List<DepartmentPosition> departmentPositions)
     {
         Id = id;
@@ -20,7 +22,7 @@ public class Position
         Name = name;
         Description = description;
         IsActive = true;
-        _departmentPositions = departmentPositions;
+        _departments = departmentPositions;
     }
 
     public Guid Id { get; private set; }
@@ -35,9 +37,7 @@ public class Position
 
     public DateTime UpdatedAt { get; private set; }
     
-    private readonly List<DepartmentPosition> _departmentPositions = [];
-    
-    public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions;
+    public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departments;
 
     public static Result<Position, Error> Create(Guid id, Name name, string? description, List<DepartmentPosition> departmentPositions)
     {

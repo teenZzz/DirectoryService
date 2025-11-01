@@ -34,7 +34,7 @@ public class LocationsRepository : ILocationRepository
     public async Task<Result<bool, Error>> ExistsByNameAsync(Name locationName, CancellationToken cancellationToken)
     {
         bool exists = await _dbContext.Locations
-            .AnyAsync(l => l.Name.Value == locationName.Value, cancellationToken);
+            .AnyAsync(l => l.Name == locationName, cancellationToken);
 
         return exists;
     }
@@ -67,7 +67,19 @@ public class LocationsRepository : ILocationRepository
         return existingCount == locationIds.Count;
     }
 
-    private async Task<UnitResult<Error>> SaveChangesAsync(CancellationToken cancellationToken)
+    public async Task<Result<bool, Errors>> AllExistAndActiveAsync(IReadOnlyCollection<Guid> locationIds, CancellationToken cancellationToken)
+    {
+        if (locationIds.Count == 0)
+            return true;
+
+        var existingCount = await _dbContext.Locations
+            .Where(l => locationIds.Contains(l.Id) && l.IsActive)
+            .CountAsync(cancellationToken);
+
+        return existingCount == locationIds.Count;
+    }
+
+    public async Task<UnitResult<Error>> SaveChangesAsync(CancellationToken cancellationToken)
     {
         try
         {

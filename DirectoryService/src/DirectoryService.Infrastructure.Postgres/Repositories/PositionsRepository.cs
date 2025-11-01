@@ -2,6 +2,7 @@
 using DirectoryService.Application.Positions;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Shared;
+using DirectoryService.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -29,13 +30,13 @@ public class PositionsRepository : IPositionRepository
         return position.Id;
     }
 
-    public async Task<Result<bool, Error>> NameExistAndActiveAsync(string name, CancellationToken cancellationToken)
+    public async Task<Result<bool, Error>> NameExistAndActiveAsync(Name name, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        if (string.IsNullOrWhiteSpace(name.Value))
             return Error.Validation("position.name", "Position name cannot be empty");
 
         var exists = await _dbContext.Positions
-            .AnyAsync(p => p.Name.Value == name && p.IsActive, cancellationToken);
+            .AnyAsync(p => p.Name == name && p.IsActive, cancellationToken);
 
         return exists;
     }
@@ -51,24 +52,17 @@ public class PositionsRepository : IPositionRepository
         return position;
     }
 
-    private async Task<UnitResult<Error>> SaveChangesAsync(CancellationToken cancellationToken)
+    public async Task<UnitResult<Error>> SaveChangesAsync(CancellationToken cancellationToken)
     {
         try
         {
             await _dbContext.SaveChangesAsync(cancellationToken);
             return UnitResult.Success<Error>();
         }
-        catch (DbUpdateException ex)
+        catch (Exception e)
         {
-            var baseMsg = ex.GetBaseException().Message;
-            _logger.LogError(ex, "DB update error: {Message}", baseMsg);
-            return Error.Failure("db.update", $"DB update failed: {baseMsg}");
-        }
-        catch (Exception ex)
-        {
-            var baseMsg = ex.GetBaseException().Message;
-            _logger.LogError(ex, "Unexpected DB error: {Message}", baseMsg);
-            return Error.Failure("db.unexpected", $"Unexpected DB error: {baseMsg}");
+            _logger.LogError(e, "Error saving changes!");
+            return GeneralErrors.General.Failure();
         }
     }
 }

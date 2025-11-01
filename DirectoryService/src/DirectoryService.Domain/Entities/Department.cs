@@ -12,6 +12,9 @@ public class Department
     {
     }
     
+    private List<DepartmentLocation> _departmentLocations = [];
+    private readonly List<DepartmentPosition> _departmentPositions = [];
+    
     private Department(
         Guid id,
         Name name, 
@@ -19,7 +22,7 @@ public class Department
         Guid? parentId, 
         Path path,
         DepartmentDepth depth,
-        List<DepartmentLocation> departmentLocations)
+        IEnumerable<DepartmentLocation> departmentLocations)
     {
         Id = id;
         CreatedAt = DateTime.UtcNow;
@@ -30,7 +33,7 @@ public class Department
         Path = path;
         Depth = depth;
         IsActive = true;
-        _departmentLocations = departmentLocations;
+        _departmentLocations = departmentLocations.ToList();
     }
 
     public Guid Id { get; private set; }
@@ -50,18 +53,12 @@ public class Department
     public DateTime CreatedAt { get; private set; }
 
     public DateTime UpdatedAt { get; private set; }
-
-    private readonly List<Department> _children = [];
-    
-    public IReadOnlyList<Department> Children => _children;
-
-    private readonly List<DepartmentLocation> _departmentLocations = [];
     
     public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations;
 
-    private readonly List<DepartmentPosition> _departmentPositions = [];
-
     public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions;
+    
+    public List<Department> Children => [];
 
     public static Result<Department, Error> CreateParent(
         Guid id,
@@ -98,6 +95,22 @@ public class Department
         var path = parent.Path.CreateChild(identifier);
 
         return new Department(id, name, identifier, parent.Id, path, depth, departmentLocations);
+    }
+    
+    public UnitResult<Error> UpdateLocations(IEnumerable<DepartmentLocation> newLocations)
+    {
+        var newLocationsList = newLocations.ToList();
+
+        if (newLocationsList.Count == 0)
+        {
+            return Error.Validation("department.location", "Department locations must contain at least one location");
+        }
+
+        _departmentLocations = newLocationsList;
+        
+        UpdatedAt = DateTime.UtcNow;
+
+        return UnitResult.Success<Error>();
     }
 
 }
